@@ -10,17 +10,13 @@
 }
 
 #states {
-    fill: #aaa;
-}
-
-.symbol {
-    fill: steelblue;
-    fill-opacity: .8;
+    fill: #e5e5e5;
     stroke: #fff;
+    stroke-width: 1px;
 }
 
 #states .active {
-    fill: orange;
+    fill: #ffba50;
 }
 
 #state-borders {
@@ -37,12 +33,11 @@
 }
 
 .bar {
-    stroke: steelblue;
-    stroke-width: 1px;
+    stroke-width: .5px;
 }
 
 .bar:hover {
-    fill: steelblue !important;
+    fill: #48803f !important;
     cursor: pointer;
 }
 
