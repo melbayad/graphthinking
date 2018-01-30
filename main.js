@@ -2,8 +2,8 @@
 var width = 960,
     height = 500,
     centered,
-    usjson = "https://s3-us-west-2.amazonaws.com/vida-public/geo/us.json",
-    total_neight = "https://gist.githubusercontent.com/oikonang/6bce54dd9dc0eb702b66fcb5d62b76a9/raw/1bad0960f4578268c5b20bd9077b88f34ac3e170/total_neight.csv",
+    us_geo_data = "https://s3-us-west-2.amazonaws.com/vida-public/geo/us.json",
+    us_states_names = "https://s3-us-west-2.amazonaws.com/vida-public/geo/us-state-names.tsv",
     config = {
         coveredCharges: "Average Covered Charges",
         state: "Provider State",
@@ -11,286 +11,225 @@ var width = 960,
         barColor: "#6ea865"
     };
 
-/*
-function getCentroid(selection) {
-    // get the DOM element from a D3 selection
-    // you could also use "this" inside .each()
-    var element = selection.node(),
-        // use the native SVG interface to get the bounding box
-        bbox = element.getBBox();
-    // return the center of the bounding box
-    return [bbox.x + bbox.width / 2, bbox.y + bbox.height / 2];
-}
-*/
-
-var barsJson = [
+// Bars Data
+var bars_data = [
     {
         "Provider State": "AK",
-        "Average Covered Charges": "59078.2784598214",
-        "Average Total Payments": "23132.6559709821"
+        "Average Covered Charges": "59078.2784598214"
     },
     {
         "Provider State": "AL",
-        "Average Covered Charges": "61181.4369089227",
-        "Average Total Payments": "13807.2814555921"
+        "Average Covered Charges": "61181.4369089227"
     },
     {
         "Provider State": "AR",
-        "Average Covered Charges": "44818.5625",
-        "Average Total Payments": "13912.102697424"
+        "Average Covered Charges": "44818.5625"
     },
     {
         "Provider State": "AZ",
-        "Average Covered Charges": "65754.4788504464",
-        "Average Total Payments": "17073.4044084821"
+        "Average Covered Charges": "65754.4788504464"
     },
     {
         "Provider State": "CA",
-        "Average Covered Charges": "100830.153520886",
-        "Average Total Payments": "19767.2411944971"
+        "Average Covered Charges": "100830.153520886"
     },
     {
         "Provider State": "CO",
-        "Average Covered Charges": "68100.9391741071",
-        "Average Total Payments": "16536.4827008929"
+        "Average Covered Charges": "68100.9391741071"
     },
     {
         "Provider State": "CT",
-        "Average Covered Charges": "48955.7301580256",
-        "Average Total Payments": "19535.7110262784"
+        "Average Covered Charges": "48955.7301580256"
     },
     {
         "Provider State": "DC",
-        "Average Covered Charges": "60255.4931640625",
-        "Average Total Payments": "19915.5439453125"
+        "Average Covered Charges": "60255.4931640625"
     },
     {
         "Provider State": "DE",
-        "Average Covered Charges": "43735.3149414063",
-        "Average Total Payments": "17774.1983642578"
+        "Average Covered Charges": "43735.3149414063"
     },
     {
         "Provider State": "FL",
-        "Average Covered Charges": "77337.8813831676",
-        "Average Total Payments": "15444.6648126776"
+        "Average Covered Charges": "77337.8813831676"
     },
     {
         "Provider State": "GA",
-        "Average Covered Charges": "55852.6706923739",
-        "Average Total Payments": "15457.974483945"
+        "Average Covered Charges": "55852.6706923739"
     },
     {
         "Provider State": "HI",
-        "Average Covered Charges": "41059.1026278409",
-        "Average Total Payments": "19601.2294921875"
+        "Average Covered Charges": "41059.1026278409"
     },
     {
         "Provider State": "IA",
-        "Average Covered Charges": "41698.3305555556",
-        "Average Total Payments": "14530.1142144097"
+        "Average Covered Charges": "41698.3305555556"
     },
     {
         "Provider State": "ID",
-        "Average Covered Charges": "41783.8566623264",
-        "Average Total Payments": "16147.0880533854"
+        "Average Covered Charges": "41783.8566623264"
     },
     {
         "Provider State": "IL",
-        "Average Covered Charges": "62686.7212346717",
-        "Average Total Payments": "17002.2414396262"
+        "Average Covered Charges": "62686.7212346717"
     },
     {
         "Provider State": "IN",
-        "Average Covered Charges": "52429.3961219394",
-        "Average Total Payments": "15316.2844112436"
+        "Average Covered Charges": "52429.3961219394"
     },
     {
         "Provider State": "KS",
-        "Average Covered Charges": "48067.6885964912",
-        "Average Total Payments": "14689.0967310855"
+        "Average Covered Charges": "48067.6885964912"
     },
     {
         "Provider State": "KY",
-        "Average Covered Charges": "47007.7856657609",
-        "Average Total Payments": "15634.1505180027"
+        "Average Covered Charges": "47007.7856657609"
     },
     {
         "Provider State": "LA",
-        "Average Covered Charges": "53119.2979329427",
-        "Average Total Payments": "14186.3437364366"
+        "Average Covered Charges": "53119.2979329427"
     },
     {
         "Provider State": "MA",
-        "Average Covered Charges": "39318.5713141026",
-        "Average Total Payments": "18863.3703675881"
+        "Average Covered Charges": "39318.5713141026"
     },
     {
         "Provider State": "MD",
-        "Average Covered Charges": "26383.2026941636",
-        "Average Total Payments": "24868.405373966"
+        "Average Covered Charges": "26383.2026941636"
     },
     {
         "Provider State": "ME",
-        "Average Covered Charges": "37363.4869290865",
-        "Average Total Payments": "15910.5087515024"
+        "Average Covered Charges": "37363.4869290865"
     },
     {
         "Provider State": "MI",
-        "Average Covered Charges": "41147.6743285124",
-        "Average Total Payments": "16646.7688533058"
+        "Average Covered Charges": "41147.6743285124"
     },
     {
         "Provider State": "MN",
-        "Average Covered Charges": "42913.2444069602",
-        "Average Total Payments": "17023.1782522491"
+        "Average Covered Charges": "42913.2444069602"
     },
     {
         "Provider State": "MO",
-        "Average Covered Charges": "52679.6893872893",
-        "Average Total Payments": "15499.3312192767"
+        "Average Covered Charges": "52679.6893872893"
     },
     {
         "Provider State": "MS",
-        "Average Covered Charges": "57754.7923339844",
-        "Average Total Payments": "15158.8320556641"
+        "Average Covered Charges": "57754.7923339844"
     },
     {
         "Provider State": "MT",
-        "Average Covered Charges": "35968.5696231618",
-        "Average Total Payments": "15791.4245174632"
+        "Average Covered Charges": "35968.5696231618"
     },
     {
         "Provider State": "NC",
-        "Average Covered Charges": "49195.471705163",
-        "Average Total Payments": "16018.2841966712"
+        "Average Covered Charges": "49195.471705163"
     },
     {
         "Provider State": "ND",
-        "Average Covered Charges": "39473.4904296875",
-        "Average Total Payments": "16576.6787109375"
+        "Average Covered Charges": "39473.4904296875"
     },
     {
         "Provider State": "NE",
-        "Average Covered Charges": "50565.7337688578",
-        "Average Total Payments": "15916.9261179957"
+        "Average Covered Charges": "50565.7337688578"
     },
     {
         "Provider State": "NH",
-        "Average Covered Charges": "52829.2380756579",
-        "Average Total Payments": "17319.908151727"
+        "Average Covered Charges": "52829.2380756579"
     },
     {
         "Provider State": "NJ",
-        "Average Covered Charges": "91061.2406529018",
-        "Average Total Payments": "17745.6369861421"
+        "Average Covered Charges": "91061.2406529018"
     },
     {
         "Provider State": "NM",
-        "Average Covered Charges": "53526.8279622396",
-        "Average Total Payments": "15720.1822102865"
+        "Average Covered Charges": "53526.8279622396"
     },
     {
         "Provider State": "NV",
-        "Average Covered Charges": "86361.0890925481",
-        "Average Total Payments": "16359.9822716346"
+        "Average Covered Charges": "86361.0890925481"
     },
     {
         "Provider State": "NY",
-        "Average Covered Charges": "50859.44697051",
-        "Average Total Payments": "19365.8014197716"
+        "Average Covered Charges": "50859.44697051"
     },
     {
         "Provider State": "OH",
-        "Average Covered Charges": "49334.3986399581",
-        "Average Total Payments": "15233.7520126715"
+        "Average Covered Charges": "49334.3986399581"
     },
     {
         "Provider State": "OK",
-        "Average Covered Charges": "54621.7205033736",
-        "Average Total Payments": "14900.9030095881"
+        "Average Covered Charges": "54621.7205033736"
     },
     {
         "Provider State": "OR",
-        "Average Covered Charges": "44843.267177484",
-        "Average Total Payments": "17173.4408553686"
+        "Average Covered Charges": "44843.267177484"
     },
     {
         "Provider State": "PA",
-        "Average Covered Charges": "62473.41015625",
-        "Average Total Payments": "15539.1570789426"
+        "Average Covered Charges": "62473.41015625"
     },
     {
         "Provider State": "RI",
-        "Average Covered Charges": "37476.8927556818",
-        "Average Total Payments": "16439.5653409091"
+        "Average Covered Charges": "37476.8927556818"
     },
     {
         "Provider State": "SC",
-        "Average Covered Charges": "64861.5377604167",
-        "Average Total Payments": "16029.7912760417"
+        "Average Covered Charges": "64861.5377604167"
     },
     {
         "Provider State": "SD",
-        "Average Covered Charges": "42988.0791529605",
-        "Average Total Payments": "15641.3978721217"
+        "Average Covered Charges": "42988.0791529605"
     },
     {
         "Provider State": "TN",
-        "Average Covered Charges": "57804.5298763736",
-        "Average Total Payments": "14962.2524682349"
+        "Average Covered Charges": "57804.5298763736"
     },
     {
         "Provider State": "TX",
-        "Average Covered Charges": "68662.0707585424",
-        "Average Total Payments": "15708.0386536278"
+        "Average Covered Charges": "68662.0707585424"
     },
     {
         "Provider State": "UT",
-        "Average Covered Charges": "41221.4077435662",
-        "Average Total Payments": "15279.4489315257"
+        "Average Covered Charges": "41221.4077435662"
     },
     {
         "Provider State": "VA",
-        "Average Covered Charges": "54787.5018872893",
-        "Average Total Payments": "15320.0751843399"
+        "Average Covered Charges": "54787.5018872893"
     },
     {
         "Provider State": "VT",
-        "Average Covered Charges": "37162.11328125",
-        "Average Total Payments": "20235.5749511719"
+        "Average Covered Charges": "37162.11328125"
     },
     {
         "Provider State": "WA",
-        "Average Covered Charges": "61376.2659855769",
-        "Average Total Payments": "18087.1519080529"
+        "Average Covered Charges": "61376.2659855769"
     },
     {
         "Provider State": "WI",
-        "Average Covered Charges": "43179.516801883",
-        "Average Total Payments": "15303.1228715946"
+        "Average Covered Charges": "43179.516801883"
     },
     {
         "Provider State": "WV",
-        "Average Covered Charges": "35550.3622750947",
-        "Average Total Payments": "13686.7271247633"
+        "Average Covered Charges": "35550.3622750947"
     },
     {
         "Provider State": "WY",
-        "Average Covered Charges": "48963.7436079545",
-        "Average Total Payments": "19187.1149680398"
+        "Average Covered Charges": "48963.7436079545"
     }
 ]
+
 var cost_data = {}
-barsJson.forEach(function (d) {
+bars_data.forEach(function (d) {
     cost_data[d[config.state]] = {};
     cost_data[d[config.state]].charge = d[config.coveredCharges];
 })
 
 
-function createUSMap() {
+function createMap() {
 
     // Define the projection boundaries
-    var projection = d3.geoAlbersUsa()
+    var projection = d3.geoAlbers()
         .scale(1070)
         .translate([(width) / 2, (height) / 2]);
 
@@ -298,17 +237,11 @@ function createUSMap() {
     var path = d3.geoPath()
         .projection(projection);
 
-    // Define the div for the tooltip
-    var div = d3.select("#map")
+    // Define the div for the zone tooltip
+    var tooltip = d3.select("#map")
         .append("div")
         .attr("class", "tooltip")
         .style("opacity", 0);
-
-    // Define the svg for the map
-    var svg = d3.select("#map")
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height);
 
     // Define bars tooltips
     var divs = $("div.tooltips");
@@ -321,6 +254,12 @@ function createUSMap() {
         var div = d3.select("div.tooltips");
     }
 
+    // Define the svg for the map
+    var svg = d3.select("#map")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
     svg.append("rect")
         .attr("class", "background")
         .attr("width", width)
@@ -331,14 +270,13 @@ function createUSMap() {
     var g = svg.append("g");
 
 
-    var color = d3.scaleOrdinal().range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]),
-        state_ids = [0],
+    var state_ids = [0],
         id_state_map = {0: ""},
         id_name_map = {0: null},
         short_name_id_map = {0: null};
 
 
-    d3.tsv("https://s3-us-west-2.amazonaws.com/vida-public/geo/us-state-names.tsv", function (error, names) {
+    d3.tsv(us_states_names, function (error, names) {
         for (var i = 0; i < names.length; i++) {
             id_name_map[names[i].id] = names[i];
             short_name_id_map[names[i].code] = names[i].id;
@@ -350,7 +288,7 @@ function createUSMap() {
             return +d[config.totalPayments];
         })]);
 
-        d3.json(usjson, function (err, us) {
+        d3.json(us_geo_data, function (err, us) {
             if (err) console.log;
 
             g.append("g")
@@ -364,7 +302,7 @@ function createUSMap() {
                     return d.state;
                 })
                 .attr("d", path)
-                //.on("mouseover", hovered)
+                //.on("mouseover", mouseover)
                 .on("click", clicked);
 
             svg.selectAll('.state-path')
@@ -419,8 +357,8 @@ function createUSMap() {
                 });
             }
 
-            /* ***************** LEGEND *******************
-            ===============================================
+            // Legend
+            /*
             var legend = svg.append("g")
                 .attr("class", "legend")
                 .attr("transform", function (d, i) {
@@ -446,8 +384,8 @@ function createUSMap() {
         });
     });
 
-    function hovered(d, i) {
-        console.log('>> Hovered >> ', d);
+    function mouseover(d, i) {
+        console.log('Hovered >> ', d);
     }
 
     function clicked(d, i) {
@@ -486,18 +424,20 @@ function createUSMap() {
             $(".tooltip").css('opacity', 0);
         }
 
+        // Highlight the clicked province
         g.selectAll("path")
             .classed("active", centered && function (d) {
                 return d === centered;
             });
 
+        // Zoom
         g.transition()
             .duration(750)
             .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")")
-            .style("stroke-width", 1.5 / k + "px");
+            .style("stroke-width", 1.3 / k + "px");
     }
 }
 
 
-// Load US map function
-createUSMap();
+// Load map function
+createMap();
