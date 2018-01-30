@@ -28,6 +28,15 @@
     pointer-events: none;
 }
 
+.state-path {
+    color: #ddd;
+    opacity: .7;
+}
+
+.state-path:hover {
+    opacity: 1;
+}
+
 #canvas {
     position: relative;
 }
@@ -52,14 +61,4 @@ div.tooltips, div.tooltip {
     border: 0;
     border-radius: 8px;
     pointer-events: none;
-}
-
-/* *** Piechart style *** */
-.arc text {
-    font: 10px sans-serif;
-    text-anchor: middle;
-}
-
-.arc path {
-    stroke: #fff;
 }

@@ -270,9 +270,7 @@ function createMap() {
     var g = svg.append("g");
 
 
-    var state_ids = [0],
-        id_state_map = {0: ""},
-        id_name_map = {0: null},
+    var id_name_map = {0: null},
         short_name_id_map = {0: null};
 
 
@@ -284,13 +282,14 @@ function createMap() {
 
         var y = d3.scaleLinear().range([height, 0]);
 
-        y.domain([0, d3.max(barsJson, function (d) {
+        y.domain([0, d3.max(bars_data, function (d) {
             return +d[config.totalPayments];
         })]);
 
         d3.json(us_geo_data, function (err, us) {
             if (err) console.log;
 
+            // Main map
             g.append("g")
                 .attr("id", "states")
                 .selectAll("path")
@@ -305,6 +304,17 @@ function createMap() {
                 //.on("mouseover", mouseover)
                 .on("click", clicked);
 
+
+            //
+            g.append("path")
+                .datum(topojson.mesh(us, us.objects.states, function (a, b) {
+                    return a !== b;
+                }))
+                .attr("id", "state-borders")
+                .attr("d", path);
+
+
+            // Barcharts
             svg.selectAll('.state-path')
                 .append("path")
                 .attr("d", path)
@@ -315,14 +325,6 @@ function createMap() {
                         cost_data[id_name_map[d.id].code].centroid = centroid;
                     }
                 });
-
-            g.append("path")
-                .datum(topojson.mesh(us, us.objects.states, function (a, b) {
-                    return a !== b;
-                }))
-                .attr("id", "state-borders")
-                .attr("d", path);
-
 
             for (var state in cost_data) {
                 g.append("rect")
@@ -356,6 +358,15 @@ function createMap() {
                     div.transition().duration(500).style("opacity", 0);
                 });
             }
+
+
+            // Coloring map
+            svg.selectAll('.state-path')
+                .style("fill", function (d) {
+                    return "#ddd"
+                })
+                .attr("d", path);
+
 
             // Legend
             /*
@@ -424,7 +435,7 @@ function createMap() {
             $(".tooltip").css('opacity', 0);
         }
 
-        // Highlight the clicked province
+        // Highlight clicked province
         g.selectAll("path")
             .classed("active", centered && function (d) {
                 return d === centered;
