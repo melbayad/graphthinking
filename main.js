@@ -4,6 +4,7 @@ var width = 960,
     centered,
     us_geo_data = "https://s3-us-west-2.amazonaws.com/vida-public/geo/us.json",
     us_states_names = "https://s3-us-west-2.amazonaws.com/vida-public/geo/us-state-names.tsv",
+    colors = {low: '#d8edd2', moderate: '#fefac6', considerable: '#fbdec2', high: '#febdc7', extrem: '#b2b2b2'},
     config = {
         coveredCharges: "Average Covered Charges",
         state: "Provider State",
@@ -304,8 +305,6 @@ function createMap() {
                 //.on("mouseover", mouseover)
                 .on("click", clicked);
 
-
-            //
             g.append("path")
                 .datum(topojson.mesh(us, us.objects.states, function (a, b) {
                     return a !== b;
@@ -359,14 +358,19 @@ function createMap() {
                 });
             }
 
-
             // Coloring map
             svg.selectAll('.state-path')
                 .style("fill", function (d) {
-                    return "#ddd"
+                    var val = cost_data[id_name_map[d.id].code];
+                    if (val && val.charge) {
+                        if (val.charge < 40000) return colors.low;
+                        else if (val.charge > 60000) return colors.considerable;
+                        else return colors.high;
+                    } else {
+                        return "#ddd";
+                    }
                 })
                 .attr("d", path);
-
 
             // Legend
             /*

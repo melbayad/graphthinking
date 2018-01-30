@@ -42,10 +42,11 @@
 
 .bar {
     stroke-width: .5px;
+    opacity: .7;
 }
 
 .bar:hover {
-    fill: #48803f !important;
+    opacity: 1 !important;
     cursor: pointer;
 }
 
