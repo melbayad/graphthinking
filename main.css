@@ -16,7 +16,7 @@
 }
 
 #states .active {
-    fill: #ffba50;
+    fill: #ffba50 !important;
 }
 
 #state-borders {
@@ -29,7 +29,6 @@
 }
 
 .state-path {
-    color: #ddd;
     opacity: .7;
 }
 
