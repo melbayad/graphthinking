@@ -9,8 +9,22 @@ var width = 960,
         coveredCharges: "Average Covered Charges",
         state: "Provider State",
         totalPayments: "Average Total Payments",
-        barColor: "#6ea865"
-    };
+        barColor: "#6ea865",
+        pieChart: {
+            data: [10, 20, 100],
+            width: 225,
+            height: 125,
+            color: d3.scaleOrdinal().range(["#98abc5", "#8a89a6", "#7b6888"])
+        }
+    },
+    pie_config = {
+        data: [10, 20, 100],
+        width: 225,
+        height: 125,
+        color: d3.scaleOrdinal().range(["#98abc5", "#8a89a6", "#7b6888"])
+    },
+    pie_radius = Math.min(pie_config.width, pie_config.height) / 2;
+
 
 // Bars Data
 var bars_data = [
@@ -231,7 +245,7 @@ function createMap() {
 
     // Define the projection boundaries
     var projection = d3.geoAlbers()
-        .scale(1070)
+        .scale(1030)
         .translate([(width) / 2, (height) / 2]);
 
     // Define the path
@@ -267,13 +281,11 @@ function createMap() {
         .attr("height", height)
         .on("click", clicked);
 
-    // Define the g for each neighborhood
+    // Define the g for each zone
     var g = svg.append("g");
-
 
     var id_name_map = {0: null},
         short_name_id_map = {0: null};
-
 
     d3.tsv(us_states_names, function (error, names) {
         for (var i = 0; i < names.length; i++) {
@@ -333,7 +345,7 @@ function createMap() {
                     .attr("state", state)
                     .attr("transform", function (d) {
                         var centroid = cost_data[state].centroid;
-                        centroid[0] = centroid[0] - 10;
+                        centroid[0] = centroid[0] - 5;
                         return "translate(" + centroid + ")";
                     })
                     .attr("height", function (d) {
@@ -344,10 +356,9 @@ function createMap() {
                         }
                     })
                     .on("mouseover", function (d) {
-                        var state = $(this).attr("state");
-                        var centroid = cost_data[state].centroid;
-                        var x = centroid[0] - 15;
-                        var y = centroid[1] - cost_data[state].charge / 1000 - 20;
+                        var x = d3.event.pageX;
+                        var y = d3.event.pageY;
+
                         div.transition().duration(200).style("opacity", 1);
                         div.html(state + "<br/>" + "$" +
                             Math.round(cost_data[state].charge / 1000) + "K")
@@ -371,6 +382,7 @@ function createMap() {
                     }
                 })
                 .attr("d", path);
+
 
             // Legend
             /*
@@ -422,7 +434,58 @@ function createMap() {
                 .style("opacity", .9);
 
             // Write staff on tooltip
-            div.html("<strong>Hi, I'm Tooltip !</strong>")
+            div.html(
+                '<div>' +
+                '<strong>Hi, I\'m Tooltip !</strong> ' +
+                '<br/>' +
+                '<div id="pie-chart"></div> ' +
+                '<br/>' +
+                'Place Piechart here !' +
+                '</div>'
+            );
+
+
+            // Pie chart
+            var arc = d3.arc()
+                .outerRadius(pie_radius - 10)
+                .innerRadius(0);
+
+            var labelArc = d3.arc()
+                .outerRadius(pie_radius - 40)
+                .innerRadius(pie_radius - 40);
+
+            var pie = d3.pie()
+                .sort(null)
+                .value(function (d) {
+                    return d;
+                });
+
+            var pie_svg = d3.select("div.tooltips #pie-chart")
+                .append("svg")
+                .attr("width", 200)
+                .attr("height", 200)
+                .append("g")
+                .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+            var pie_g = svg.selectAll(".arc")
+                .data(pie(pie_config.data))
+                .enter().append("g")
+                .attr("class", "arc");
+
+            pie_g.append("path")
+                .attr("d", arc)
+                .style("fill", function (d) {
+                    return pie_config.color(d.data);
+                });
+
+            pie_g.append("text")
+                .attr("transform", function (d) {
+                    return "translate(" + labelArc.centroid(d) + ")";
+                })
+                .attr("dy", ".35em")
+                .text(function (d) {
+                    return d.data;
+                });
 
             // Place the tooltip
             div.style("left", (d3.mouse(this)[0]) + "px")
@@ -437,6 +500,7 @@ function createMap() {
 
             // Hide the tooltip
             $(".tooltip").css('opacity', 0);
+            $(".tooltips").css('opacity', 0);
         }
 
         // Highlight clicked province

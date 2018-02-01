@@ -28,11 +28,11 @@
     pointer-events: none;
 }
 
-.state-path {
+.state-path:not(.active) {
     opacity: .7;
 }
 
-.state-path:hover {
+.state-path:not(.active):hover {
     opacity: 1;
 }
 
@@ -61,4 +61,13 @@ div.tooltips, div.tooltip {
     border: 0;
     border-radius: 8px;
     pointer-events: none;
+}
+
+.arc text {
+    font: 10px sans-serif;
+    text-anchor: middle;
+}
+
+.arc path {
+    stroke: #fff;
 }
