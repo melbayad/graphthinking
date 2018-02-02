@@ -381,8 +381,6 @@ function createMap() {
     function clicked(d) {
         var x, y, k;
 
-        console.log('D => ', d)
-
         // IF zoomed-in state is on
         if (d && centered !== d) {
 
@@ -412,6 +410,7 @@ function createMap() {
             // Place the tooltip
             zone_tp.style("left", (d3.mouse(this)[0]) + "px")
                 .style("top", (d3.mouse(this)[1]) + "px");
+
         } else {
             x = width / 2;
             y = height / 2;
@@ -437,7 +436,7 @@ function createMap() {
 }
 
 
-function buildPieChart(parent, conf, targetId, data) {
+function buildPieChart(parent, conf, target_id, data) {
     var size = conf.size,
         color = conf.color,
         radius = Math.min(size.w, size.h) / 2;
@@ -463,10 +462,10 @@ function buildPieChart(parent, conf, targetId, data) {
 
 
     // Define piechart svg
-    var div = $(targetId)
+    var div = $(target_id)
 
     if (div.length === 0) {
-        var svg = d3.select("#map" + " " + parent)
+        var svg = d3.select("#" + map_id + " " + parent)
             .append("svg")
             .attr("width", size.w)
             .attr("height", size.h)
@@ -474,10 +473,10 @@ function buildPieChart(parent, conf, targetId, data) {
             .attr("transform", "translate(" + size.w / 2 + "," + size.h / 2 + ")")
             .style("display", "block")
 
-        svg = targetId ? svg.attr("id", targetId) : svg;
+        svg = target_id ? svg.attr("id", target_id) : svg;
 
     } else {
-        var svg = d3.select(".zone-tp" + " " + "#" + targetId);
+        var svg = d3.select(".zone-tp" + " " + "#" + target_id);
     }
 
     var g = svg.selectAll(".arc")
