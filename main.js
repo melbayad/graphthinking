@@ -398,6 +398,7 @@ function createMap() {
                 '<div class="content">' +
                 '<h4 class="title">Hi, I\'m Tooltip !</h4>' +
                 '<p>I\'m gonna use Piechart below...</p>' +
+                // Draw piechart here
                 '</div>'
             );
 
@@ -434,7 +435,7 @@ function createMap() {
             $("." + zone_tp_cs).css('opacity', 0);
         }
 
-        // Highlight clicked province
+        // Highlight clicked zone
         g.selectAll("path")
             .classed("active", centered && function (d) {
                 return d === centered;
