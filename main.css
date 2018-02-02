@@ -64,6 +64,7 @@
 
 .bar-tp {
     background: lightsteelblue;
+    z-index: 1;
 }
 
 .zone-tp {
@@ -72,6 +73,7 @@
     padding: 7px 9px;
     background-color: #fff;
     box-shadow: 1px 1.5px 4px 1px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
 }
 
 .zone-tp .content {
@@ -97,4 +99,9 @@
 
 .arc path {
     stroke: #fff;
+}
+
+.legend {
+    fill: white;
+    stroke: black;
 }

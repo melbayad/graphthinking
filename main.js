@@ -12,21 +12,15 @@ var width = 960,
         coveredCharges: "Average Covered Charges",
         state: "Provider State",
         totalPayments: "Average Total Payments",
-        barColor: "#6ea865",
-        pieChart: {
-            width: 225,
-            height: 125,
-            color: d3.scaleOrdinal().range(["#98abc5", "#8a89a6", "#7b6888"])
-        }
+        barColor: "#6ea865"
     },
     pie_config = {
         size: {w: 120, h: 120},
-        color: d3.scaleOrdinal().range(["#98abc5", "#8a89a6", "#7b6888"]),
-        data: [10, 20, 100],
+        color: d3.scaleOrdinal().range(["#98abc5", "#8a89a6", "#7b6888"])
     };
 
 
-// Bars Data
+// Bars fake data
 var bars_data = [
     {
         "Provider State": "AK",
@@ -381,6 +375,9 @@ function createMap() {
     function clicked(d) {
         var x, y, k;
 
+        // Clear zone tooltip
+        $('.' + zone_tp_cs).empty();
+
         // IF zoomed-in state is on
         if (d && centered !== d) {
 
@@ -400,12 +397,28 @@ function createMap() {
             zone_tp.html(
                 '<div class="content">' +
                 '<h4 class="title">Hi, I\'m Tooltip !</h4>' +
-                '<p>I\'m gonna use Piechart here...</p>' +
+                '<p>I\'m gonna use Piechart below...</p>' +
                 '</div>'
             );
 
-            // Create piechart
-            buildPieChart("." + zone_tp_cs, pie_config, 'piechart', [10, 20, 100]);
+
+            /* ==== Draw Piechart ===== */
+
+            // Piechart fake Data
+            var pie_data = [
+                {name: 'low', y: Math.floor(Math.random() * 30) + 1},
+                {name: 'medium', y: Math.floor(Math.random() * 30) + 1},
+                {name: 'high', y: Math.floor(Math.random() * 30) + 1}
+            ];
+
+            // adapt data to d3
+            var piechart_fake_data = [];
+            pie_data.forEach(function (d, i) {
+                piechart_fake_data[i] = d.y;
+            })
+            buildPieChart("." + zone_tp_cs, pie_config, piechart_fake_data);
+
+            /* ======================== */
 
             // Place the tooltip
             zone_tp.style("left", (d3.mouse(this)[0]) + "px")
@@ -436,7 +449,7 @@ function createMap() {
 }
 
 
-function buildPieChart(parent, conf, target_id, data) {
+function buildPieChart(parent, conf, data) {
     var size = conf.size,
         color = conf.color,
         radius = Math.min(size.w, size.h) / 2;
@@ -460,24 +473,13 @@ function buildPieChart(parent, conf, target_id, data) {
             return d;
         });
 
-
     // Define piechart svg
-    var div = $(target_id)
-
-    if (div.length === 0) {
-        var svg = d3.select("#" + map_id + " " + parent)
-            .append("svg")
-            .attr("width", size.w)
-            .attr("height", size.h)
-            .append("g")
-            .attr("transform", "translate(" + size.w / 2 + "," + size.h / 2 + ")")
-            .style("display", "block")
-
-        svg = target_id ? svg.attr("id", target_id) : svg;
-
-    } else {
-        var svg = d3.select(".zone-tp" + " " + "#" + target_id);
-    }
+    var svg = d3.select("#" + map_id + " " + parent)
+        .append("svg")
+        .attr("width", size.w)
+        .attr("height", size.h)
+        .append("g")
+        .attr("transform", "translate(" + size.w / 2 + "," + size.h / 2 + ")");
 
     var g = svg.selectAll(".arc")
         .data(pie(data))
@@ -501,32 +503,6 @@ function buildPieChart(parent, conf, target_id, data) {
 }
 
 
-/*
-function buildLegend(svg) {
-    var legend = svg.append("g")
-        .attr("class", "legend")
-        .attr("transform", function (d, i) {
-            return "translate(-500,20)";
-        });
-
-    legend.append("rect")
-        .attr("x", width - 18)
-        .attr("width", 18)
-        .attr("height", 18)
-        .style("fill", config.barColor);
-
-     legend.append("text")
-        .attr("x", width - 24)
-        .attr("y", 9)
-        .attr("dy", ".35em")
-        .style("text-anchor", "end")
-        .text(function (d) {
-            return "Charge";
-        });
-}
-*/
-
-
 // target should be a class
 function buildTooltip(target) {
     var _target = $("." + target);
@@ -540,5 +516,5 @@ function buildTooltip(target) {
     }
 }
 
-// Load map function
+// Load map
 createMap();
