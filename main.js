@@ -2,6 +2,9 @@
 var width = 960,
     height = 500,
     centered,
+    map_id = "map",
+    bar_tp_cs = "bar-tp", // Bar tooltip class
+    zone_tp_cs = "zone-tp", // Zone tooltip class
     us_geo_data = "https://s3-us-west-2.amazonaws.com/vida-public/geo/us.json",
     us_states_names = "https://s3-us-west-2.amazonaws.com/vida-public/geo/us-state-names.tsv",
     colors = {low: '#d8edd2', moderate: '#fefac6', considerable: '#fbdec2', high: '#febdc7', extrem: '#b2b2b2'},
@@ -11,19 +14,16 @@ var width = 960,
         totalPayments: "Average Total Payments",
         barColor: "#6ea865",
         pieChart: {
-            data: [10, 20, 100],
             width: 225,
             height: 125,
             color: d3.scaleOrdinal().range(["#98abc5", "#8a89a6", "#7b6888"])
         }
     },
     pie_config = {
+        size: {w: 120, h: 120},
+        color: d3.scaleOrdinal().range(["#98abc5", "#8a89a6", "#7b6888"]),
         data: [10, 20, 100],
-        width: 225,
-        height: 125,
-        color: d3.scaleOrdinal().range(["#98abc5", "#8a89a6", "#7b6888"])
-    },
-    pie_radius = Math.min(pie_config.width, pie_config.height) / 2;
+    };
 
 
 // Bars Data
@@ -253,24 +253,13 @@ function createMap() {
         .projection(projection);
 
     // Define the div for the zone tooltip
-    var tooltip = d3.select("#map")
-        .append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
+    var zone_tp = buildTooltip(zone_tp_cs)
 
     // Define bars tooltips
-    var divs = $("div.tooltips");
-    if (divs.length === 0) {
-        var div = d3.select("#map")
-            .append("div")
-            .attr("class", "tooltips")
-            .style("opacity", 0);
-    } else {
-        var div = d3.select("div.tooltips");
-    }
+    var bar_tp = buildTooltip(bar_tp_cs)
 
     // Define the svg for the map
-    var svg = d3.select("#map")
+    var svg = d3.select("#" + map_id)
         .append("svg")
         .attr("width", width)
         .attr("height", height);
@@ -279,7 +268,7 @@ function createMap() {
         .attr("class", "background")
         .attr("width", width)
         .attr("height", height)
-        .on("click", clicked);
+        .on("click", clicked)
 
     // Define the g for each zone
     var g = svg.append("g");
@@ -300,7 +289,7 @@ function createMap() {
         })]);
 
         d3.json(us_geo_data, function (err, us) {
-            if (err) console.log;
+            if (err) console.error;
 
             // Main map
             g.append("g")
@@ -314,7 +303,6 @@ function createMap() {
                     return d.state;
                 })
                 .attr("d", path)
-                //.on("mouseover", mouseover)
                 .on("click", clicked);
 
             g.append("path")
@@ -356,16 +344,20 @@ function createMap() {
                         }
                     })
                     .on("mouseover", function (d) {
+                        var state = $(this).attr("state");
                         var x = d3.event.pageX;
                         var y = d3.event.pageY;
 
-                        div.transition().duration(200).style("opacity", 1);
-                        div.html(state + "<br/>" + "$" +
+                        bar_tp.transition().duration(200).style("opacity", 1);
+
+                        // Tooltip content
+                        bar_tp.html(state + "<br/>" + "$" +
                             Math.round(cost_data[state].charge / 1000) + "K")
                             .style("left", x + "px")
                             .style("top", y + "px");
+
                     }).on("mouseout", function (d) {
-                    div.transition().duration(500).style("opacity", 0);
+                    bar_tp.transition().duration(500).style("opacity", 0);
                 });
             }
 
@@ -382,41 +374,14 @@ function createMap() {
                     }
                 })
                 .attr("d", path);
-
-
-            // Legend
-            /*
-            var legend = svg.append("g")
-                .attr("class", "legend")
-                .attr("transform", function (d, i) {
-                    return "translate(-500,20)";
-                });
-
-            legend.append("rect")
-                .attr("x", width - 18)
-                .attr("width", 18)
-                .attr("height", 18)
-                .style("fill", config.barColor);
-
-             legend.append("text")
-                .attr("x", width - 24)
-                .attr("y", 9)
-                .attr("dy", ".35em")
-                .style("text-anchor", "end")
-                .text(function (d) {
-                    return "Charge";
-                });
-            */
-
         });
     });
 
-    function mouseover(d, i) {
-        console.log('Hovered >> ', d);
-    }
 
-    function clicked(d, i) {
+    function clicked(d) {
         var x, y, k;
+
+        console.log('D => ', d)
 
         // IF zoomed-in state is on
         if (d && centered !== d) {
@@ -429,78 +394,32 @@ function createMap() {
             centered = d;
 
             // Show tooltip
-            div.transition()
+            zone_tp.transition()
                 .duration(200)
                 .style("opacity", .9);
 
             // Write staff on tooltip
-            div.html(
-                '<div>' +
-                '<strong>Hi, I\'m Tooltip !</strong> ' +
-                '<br/>' +
-                '<div id="pie-chart"></div> ' +
-                '<br/>' +
-                'Place Piechart here !' +
+            zone_tp.html(
+                '<div class="content">' +
+                '<h4 class="title">Hi, I\'m Tooltip !</h4>' +
+                '<p>I\'m gonna use Piechart here...</p>' +
                 '</div>'
             );
 
-
-            // Pie chart
-            var arc = d3.arc()
-                .outerRadius(pie_radius - 10)
-                .innerRadius(0);
-
-            var labelArc = d3.arc()
-                .outerRadius(pie_radius - 40)
-                .innerRadius(pie_radius - 40);
-
-            var pie = d3.pie()
-                .sort(null)
-                .value(function (d) {
-                    return d;
-                });
-
-            var pie_svg = d3.select("div.tooltips #pie-chart")
-                .append("svg")
-                .attr("width", 200)
-                .attr("height", 200)
-                .append("g")
-                .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-            var pie_g = svg.selectAll(".arc")
-                .data(pie(pie_config.data))
-                .enter().append("g")
-                .attr("class", "arc");
-
-            pie_g.append("path")
-                .attr("d", arc)
-                .style("fill", function (d) {
-                    return pie_config.color(d.data);
-                });
-
-            pie_g.append("text")
-                .attr("transform", function (d) {
-                    return "translate(" + labelArc.centroid(d) + ")";
-                })
-                .attr("dy", ".35em")
-                .text(function (d) {
-                    return d.data;
-                });
+            // Create piechart
+            buildPieChart("." + zone_tp_cs, pie_config, 'piechart', [10, 20, 100]);
 
             // Place the tooltip
-            div.style("left", (d3.mouse(this)[0]) + "px")
+            zone_tp.style("left", (d3.mouse(this)[0]) + "px")
                 .style("top", (d3.mouse(this)[1]) + "px");
-
-
         } else {
             x = width / 2;
             y = height / 2;
             k = 1;
             centered = null;
 
-            // Hide the tooltip
-            $(".tooltip").css('opacity', 0);
-            $(".tooltips").css('opacity', 0);
+            // Hide tooltip
+            $("." + zone_tp_cs).css('opacity', 0);
         }
 
         // Highlight clicked province
@@ -517,6 +436,110 @@ function createMap() {
     }
 }
 
+
+function buildPieChart(parent, conf, targetId, data) {
+    var size = conf.size,
+        color = conf.color,
+        radius = Math.min(size.w, size.h) / 2;
+
+    // Default size
+    if (!size) {
+        size = {w: 120, h: 120}
+    }
+
+    var arc = d3.arc()
+        .outerRadius(radius - 10)
+        .innerRadius(0);
+
+    var labelArc = d3.arc()
+        .outerRadius(radius - 40)
+        .innerRadius(radius - 40);
+
+    var pie = d3.pie()
+        .sort(null)
+        .value(function (d) {
+            return d;
+        });
+
+
+    // Define piechart svg
+    var div = $(targetId)
+
+    if (div.length === 0) {
+        var svg = d3.select("#map" + " " + parent)
+            .append("svg")
+            .attr("width", size.w)
+            .attr("height", size.h)
+            .append("g")
+            .attr("transform", "translate(" + size.w / 2 + "," + size.h / 2 + ")")
+            .style("display", "block")
+
+        svg = targetId ? svg.attr("id", targetId) : svg;
+
+    } else {
+        var svg = d3.select(".zone-tp" + " " + "#" + targetId);
+    }
+
+    var g = svg.selectAll(".arc")
+        .data(pie(data))
+        .enter().append("g")
+        .attr("class", "arc");
+
+    g.append("path")
+        .attr("d", arc)
+        .style("fill", function (d) {
+            return color(d.data);
+        });
+
+    g.append("text")
+        .attr("transform", function (d) {
+            return "translate(" + labelArc.centroid(d) + ")";
+        })
+        .attr("dy", ".35em")
+        .text(function (d) {
+            return d.data;
+        });
+}
+
+
+/*
+function buildLegend(svg) {
+    var legend = svg.append("g")
+        .attr("class", "legend")
+        .attr("transform", function (d, i) {
+            return "translate(-500,20)";
+        });
+
+    legend.append("rect")
+        .attr("x", width - 18)
+        .attr("width", 18)
+        .attr("height", 18)
+        .style("fill", config.barColor);
+
+     legend.append("text")
+        .attr("x", width - 24)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .style("text-anchor", "end")
+        .text(function (d) {
+            return "Charge";
+        });
+}
+*/
+
+
+// target should be a class
+function buildTooltip(target) {
+    var _target = $("." + target);
+    if (_target.length === 0) {
+        return d3.select("#" + map_id)
+            .append("div")
+            .attr("class", target)
+            .style("opacity", 0);
+    } else {
+        return d3.select("." + target);
+    }
+}
 
 // Load map function
 createMap();
