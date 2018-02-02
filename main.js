@@ -406,9 +406,9 @@ function createMap() {
 
             // Piechart fake Data
             var pie_data = [
-                {name: 'low', y: Math.floor(Math.random() * 30) + 1},
-                {name: 'medium', y: Math.floor(Math.random() * 30) + 1},
-                {name: 'high', y: Math.floor(Math.random() * 30) + 1}
+                {name: 'low', y: Math.floor(Math.random() * 30)},
+                {name: 'medium', y: Math.floor(Math.random() * 30) + 10},
+                {name: 'high', y: Math.floor(Math.random() * 30) + 30}
             ];
 
             // adapt data to d3
